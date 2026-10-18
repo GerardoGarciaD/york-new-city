@@ -10,7 +10,7 @@ const TILT_VERTICAL_DEGREES = 12;
 
 /**
  * Full-screen login with the travel license.
- * checkPassword(password) -> Promise<boolean>; onAuthenticated(playerKey) runs after the exit animation.
+ * checkPassword(password, playerKey) -> Promise<boolean>, throws when offline; onAuthenticated(playerKey) runs after the exit animation.
  */
 export function LoginGate({ defaultPlayer = "firstPlayer", checkPassword, onAuthenticated }) {
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -47,7 +47,13 @@ export function LoginGate({ defaultPlayer = "firstPlayer", checkPassword, onAuth
       setErrorMessage("Escriban la contraseña para entrar.");
       return;
     }
-    const isCorrect = await checkPassword(password);
+    let isCorrect;
+    try {
+      isCorrect = await checkPassword(password, selectedPlayer);
+    } catch {
+      setErrorMessage("No hay conexión con el servidor. Intenten de nuevo.");
+      return;
+    }
     if (!isCorrect) {
       setErrorMessage("Esa contraseña no coincide. Intenten de nuevo.");
       shakeCard();

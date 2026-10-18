@@ -5,50 +5,62 @@ Lista de lugares para comer en Nueva York para dos viajeros, hecha con React y V
 ## Cómo correrlo
 
 ```bash
-npm install
-npm run dev       # abre http://localhost:5173
-npm run build     # genera la carpeta dist/ lista para subir
-npm run preview   # prueba la versión de dist/
+yarn install
+yarn db:user LM contraseña   # crea a cada viajero (una vez)
+yarn db:user GG contraseña
+yarn db:seed                 # opcional: carga los lugares de ejemplo
+yarn dev                     # front + API, abre http://localhost:5173
 ```
 
-Para publicarlo, sube el proyecto a Vercel o Netlify (detectan Vite solos) o sube la carpeta `dist/` a cualquier hosting estático.
+En local la base de datos es un archivo (`server/data/yorknew.db`), no necesitas ninguna cuenta.
+
+## Cómo funciona
+
+- **Front** (React + Vite) en `src/`.
+- **API** (Hono) en `server/app.js`: login y lugares. En local la levanta `server/dev.js`; en Vercel, `api/index.js`.
+- **Base de datos** SQLite: un archivo en local, [Turso](https://turso.tech) en internet. Dos tablas: `users` (los dos viajeros) y `places` (cada lugar guardado como JSON).
+- No hay registro: los usuarios se crean con `yarn db:user`. El mismo comando cambia la contraseña. Si quieren una sola contraseña, pónganle la misma a los dos.
+- Cada teléfono vuelve a pedir la lista cada 15 segundos y al regresar a la pestaña, así ven lo que agregó el otro.
+
+## Publicarlo para usarlo en los dos celulares
+
+1. **Base de datos en Turso** (gratis). Crea una cuenta en turso.tech y una base de datos. Copia su URL (`libsql://…`) y crea un token.
+2. **Archivo `.env`** en la raíz del proyecto (no se sube a git):
+   ```
+   TURSO_DATABASE_URL=libsql://tu-base.turso.io
+   TURSO_AUTH_TOKEN=el-token
+   ```
+   Con eso, `yarn db:user` y `yarn db:seed` escriben en Turso. Crea ahí a los dos viajeros. Mientras exista el `.env`, `yarn dev` también usa Turso.
+3. **Vercel**: importa el repo desde vercel.com (detecta Vite solo). En *Settings → Environment Variables* agrega:
+   - `TURSO_DATABASE_URL` y `TURSO_AUTH_TOKEN` (los mismos de arriba)
+   - `SESSION_SECRET`: un texto largo al azar, por ejemplo el que da `openssl rand -hex 32`
+4. Abran la URL de Vercel en los dos celulares. Desde el navegador pueden usar "Agregar a pantalla de inicio".
 
 ## Cambios rápidos
 
-| Quiero cambiar…            | Archivo                         |
+| Quiero cambiar…            | Dónde                           |
 | -------------------------- | ------------------------------- |
 | Los nombres (LM, GG)       | `src/config/people.js`          |
-| La contraseña              | `src/config/auth.js` (ver abajo) |
+| Una contraseña             | `yarn db:user LM nueva`   |
 | Categorías, kanji, colores | `src/config/categories.js`      |
 | Lugares de ejemplo         | `src/config/places.js`          |
 | Profecía, copa, jajanken   | `src/config/fortune.js`         |
 | Colores y tipografías      | `src/styles/tokens.css`         |
 
-### Cambiar la contraseña
-
-La contraseña actual es `yorknew` (no distingue mayúsculas). Para poner otra:
-
-```bash
-npm run hash-password -- nuevaContraseña
-```
-
-Copia el resultado en `PASSWORD_HASH` dentro de `src/config/auth.js`. El login es una puerta amistosa, no seguridad real: no uses una contraseña que uses en otro lado.
-
-## Dónde se guardan los datos
-
-En el navegador de cada quien (`localStorage`), así que cada dispositivo tiene su propia lista. Para compartirla entre los dos, crea otro repositorio con las mismas funciones que `src/services/placesRepository.js` (por ejemplo con Supabase) y cámbialo en `src/hooks/usePlaces.js`. El resto de la app no se toca.
-
 ## Estructura
 
 ```
+api/index.js                Entrada de la API en Vercel
+server/                     API (app.js), base de datos (db.js) y contraseñas/tokens (auth.js)
+scripts/                    Crear usuarios y cargar lugares de ejemplo
 src/
   main.jsx                  Punto de entrada
   App.jsx                   Arma la página y conecta todo
   config/                   Datos y textos editables
   context/ToastContext.jsx  Mensajito flotante de abajo
   hooks/                    Lugares, sesión y preferencia de movimiento reducido
-  services/                 Dónde se guardan los lugares
-  utils/                    Formatos de precio, lote, hash, etc.
+  services/                 Llamadas a la API (login y lugares)
+  utils/                    Formatos de precio, lote, etc.
   styles/                   CSS original dividido por sección (el orden de index.css importa)
   components/
     layout/                 Barra, globo, encabezado, cadenas, hilo de pescar, pie

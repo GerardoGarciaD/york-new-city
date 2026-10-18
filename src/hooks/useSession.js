@@ -1,37 +1,49 @@
-import { useCallback, useState } from "react";
-import { PASSWORD_HASH, SESSION_STORAGE_KEY } from "../config/auth";
+import { useCallback, useRef, useState } from "react";
+import { SESSION_STORAGE_KEY } from "../config/auth";
 import { PLAYER_KEYS } from "../config/people";
-import { sha256Hex } from "../utils/hash";
+import { apiRequest, UnauthorizedError } from "../services/api";
 import { readStorage, removeStorage, writeStorage } from "../utils/safeStorage";
 
-function readSavedPlayer() {
-  const savedPlayer = readStorage(SESSION_STORAGE_KEY);
-  return PLAYER_KEYS.includes(savedPlayer) ? savedPlayer : null;
+function readSavedSession() {
+  try {
+    const savedSession = JSON.parse(readStorage(SESSION_STORAGE_KEY));
+    return PLAYER_KEYS.includes(savedSession?.player) && savedSession.token ? savedSession : null;
+  } catch {
+    return null;
+  }
 }
 
-/** Who is using the page, remembered in this browser. */
+/** Who is using the page, plus the token the API asked for. Remembered in this browser. */
 export function useSession() {
-  const [currentPlayer, setCurrentPlayer] = useState(readSavedPlayer);
+  const [session, setSession] = useState(readSavedSession);
+  const pendingTokenRef = useRef(null);
 
-  /** Returns true when the password matches. Does not log in yet, so the gate can animate out first. */
-  const checkPassword = useCallback(async (typedPassword) => {
+  /**
+   * Asks the server if the password is right. Returns true or false; throws if the server can't be reached.
+   * Does not log in yet, so the gate can animate out first.
+   */
+  const checkPassword = useCallback(async (typedPassword, playerKey) => {
     try {
-      const typedHash = await sha256Hex(typedPassword.trim().toLowerCase());
-      return typedHash === PASSWORD_HASH;
-    } catch {
-      return false;
+      const { token } = await apiRequest("/login", { method: "POST", body: { player: playerKey, password: typedPassword } });
+      pendingTokenRef.current = token;
+      return true;
+    } catch (error) {
+      if (error instanceof UnauthorizedError) return false;
+      throw error;
     }
   }, []);
 
   const logIn = useCallback((playerKey) => {
-    writeStorage(SESSION_STORAGE_KEY, playerKey);
-    setCurrentPlayer(playerKey);
+    const newSession = { player: playerKey, token: pendingTokenRef.current };
+    pendingTokenRef.current = null;
+    writeStorage(SESSION_STORAGE_KEY, JSON.stringify(newSession));
+    setSession(newSession);
   }, []);
 
   const logOut = useCallback(() => {
     removeStorage(SESSION_STORAGE_KEY);
-    setCurrentPlayer(null);
+    setSession(null);
   }, []);
 
-  return { currentPlayer, checkPassword, logIn, logOut };
+  return { currentPlayer: session?.player ?? null, token: session?.token ?? null, checkPassword, logIn, logOut };
 }

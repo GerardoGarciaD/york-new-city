@@ -34,8 +34,8 @@ const DIALOGS = {
 export default function App() {
   const showToast = useToast();
   const prefersReducedMotion = usePrefersReducedMotion();
-  const { places, isLoaded, nextLotNumber, addPlace, updatePlace, removePlace } = usePlaces();
-  const { currentPlayer, checkPassword, logIn, logOut } = useSession();
+  const { currentPlayer, token, checkPassword, logIn, logOut } = useSession();
+  const { places, isLoaded, nextLotNumber, addPlace, updatePlace, removePlace } = usePlaces({ token, onUnauthorized: logOut });
 
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(0);
   const [statusFilter, setStatusFilter] = useState("all");

@@ -1,57 +1,79 @@
-import { EXAMPLE_PLACES } from "../config/places";
-import { readStorage, writeStorage } from "../utils/safeStorage";
+import { apiRequest, UnauthorizedError } from "./api";
 
 /**
- * Where places are saved. This version uses the browser's localStorage,
- * so each browser keeps its own list.
+ * Where places are saved: the shared database behind the API (server/app.js),
+ * so both phones see the same list.
  *
- * To share the list between devices later (Supabase, Firebase…), write another
- * object with these same four functions and swap it in usePlaces.js:
+ * The other phone's changes arrive by asking the server again every few seconds
+ * and whenever the page comes back to the front.
  *   subscribe(onChange) -> unsubscribe
  *   addPlace(placeData)
  *   updatePlace(placeId, changes)
  *   removePlace(placeId)
  */
-const STORAGE_KEY = "york-new-city-places";
+const REFRESH_EVERY_MS = 15000;
 
-function loadPlaces() {
-  const savedText = readStorage(STORAGE_KEY);
-  if (savedText === null) return EXAMPLE_PLACES;
-  try {
-    const savedPlaces = JSON.parse(savedText);
-    return Array.isArray(savedPlaces) ? savedPlaces : [];
-  } catch {
-    return [];
-  }
-}
-
-function createId() {
-  return `place-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
-}
-
-export function createLocalPlacesRepository() {
-  let places = loadPlaces();
+export function createApiPlacesRepository({ token, onUnauthorized }) {
+  let places = [];
   const listeners = new Set();
+  let refreshTimer = null;
 
   function commit(nextPlaces) {
     places = nextPlaces;
-    writeStorage(STORAGE_KEY, JSON.stringify(places));
     listeners.forEach((listener) => listener(places));
+  }
+
+  async function request(path, options) {
+    try {
+      return await apiRequest(path, { ...options, token });
+    } catch (error) {
+      if (error instanceof UnauthorizedError) onUnauthorized();
+      throw error;
+    }
+  }
+
+  async function refresh() {
+    try {
+      commit(await request("/places"));
+    } catch {
+      // Offline or server hiccup: keep showing the last list and try again on the next tick.
+    }
+  }
+
+  function refreshWhenVisible() {
+    if (document.visibilityState === "visible") refresh();
+  }
+
+  function startRefreshing() {
+    refresh();
+    refreshTimer = setInterval(refreshWhenVisible, REFRESH_EVERY_MS);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+  }
+
+  function stopRefreshing() {
+    clearInterval(refreshTimer);
+    document.removeEventListener("visibilitychange", refreshWhenVisible);
   }
 
   return {
     subscribe(onChange) {
       listeners.add(onChange);
-      onChange(places);
-      return () => listeners.delete(onChange);
+      if (listeners.size === 1) startRefreshing();
+      return () => {
+        listeners.delete(onChange);
+        if (listeners.size === 0) stopRefreshing();
+      };
     },
     async addPlace(placeData) {
-      commit([...places, { ...placeData, id: createId() }]);
+      const createdPlace = await request("/places", { method: "POST", body: placeData });
+      commit([...places, createdPlace]);
     },
     async updatePlace(placeId, changes) {
-      commit(places.map((place) => (place.id === placeId ? { ...place, ...changes } : place)));
+      const updatedPlace = await request(`/places/${encodeURIComponent(placeId)}`, { method: "PATCH", body: changes });
+      commit(places.map((place) => (place.id === placeId ? updatedPlace : place)));
     },
     async removePlace(placeId) {
+      await request(`/places/${encodeURIComponent(placeId)}`, { method: "DELETE" });
       commit(places.filter((place) => place.id !== placeId));
     },
   };

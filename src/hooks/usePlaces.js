@@ -1,13 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
-import { createLocalPlacesRepository } from "../services/placesRepository";
+import { createApiPlacesRepository } from "../services/placesRepository";
 
-/** Live list of places plus the actions to change it. */
-export function usePlaces() {
-  const repository = useMemo(() => createLocalPlacesRepository(), []);
+/** Live list of places plus the actions to change it. Loads nothing until there is a session token. */
+export function usePlaces({ token, onUnauthorized }) {
+  const repository = useMemo(
+    () => (token ? createApiPlacesRepository({ token, onUnauthorized }) : null),
+    [token, onUnauthorized],
+  );
   const [places, setPlaces] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
+    setPlaces([]);
+    setIsLoaded(false);
+    if (!repository) return undefined;
     const unsubscribe = repository.subscribe((latestPlaces) => {
       setPlaces(latestPlaces);
       setIsLoaded(true);
@@ -21,8 +27,8 @@ export function usePlaces() {
     places,
     isLoaded,
     nextLotNumber,
-    addPlace: repository.addPlace,
-    updatePlace: repository.updatePlace,
-    removePlace: repository.removePlace,
+    addPlace: repository?.addPlace,
+    updatePlace: repository?.updatePlace,
+    removePlace: repository?.removePlace,
   };
 }
