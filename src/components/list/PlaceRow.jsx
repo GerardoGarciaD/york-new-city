@@ -1,11 +1,11 @@
 import { categoryColorStyle, findCategory } from "../../config/categories";
 import { getPersonName } from "../../config/people";
 import { STATUS_LABELS } from "../../config/places";
-import { formatLocation, formatPrice } from "../../utils/format";
+import { formatPrice } from "../../utils/format";
 
 export function PlaceRow({ place, onOpen }) {
   const category = findCategory(place.category);
-  const detailParts = [formatLocation(place)];
+  const detailParts = [category.name];
   if (place.proposedBy) detailParts.push(getPersonName(place.proposedBy));
   if (place.isExample) detailParts.push("ejemplo");
   if (place.isSecret) detailParts.push("秘 solo tú lo ves");

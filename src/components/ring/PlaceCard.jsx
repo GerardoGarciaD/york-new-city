@@ -19,7 +19,7 @@ export const PlaceCard = forwardRef(function PlaceCard({ place, onOpen }, cardRe
       type="button"
       className={`card${place.isSecret ? " is-secret" : ""}`}
       style={categoryColorStyle(category)}
-      aria-label={`${place.name}, ${place.neighborhood || place.borough}`}
+      aria-label={`${place.name}, ${category.name}`}
       onClick={onOpen}
     >
       <div className="top">
@@ -49,12 +49,7 @@ export const PlaceCard = forwardRef(function PlaceCard({ place, onOpen }, cardRe
       </span>
       <h3>{place.name}</h3>
       <div className="meta">
-        <span>
-          {place.neighborhood || place.borough}
-          <br />
-          {place.borough}
-        </span>
-        <span style={{ display: "grid", justifyItems: "end", gap: 4 }}>
+        <span style={{ display: "grid", justifyItems: "end", gap: 4, marginLeft: "auto" }}>
           {place.rating > 0 && (
             <span className={`rank${place.rating >= GEM_RANK_MIN_RATING ? " gem" : ""}`} title="Rango">
               {RANKS[place.rating]}

@@ -3,7 +3,7 @@ import { RANKS } from "../../config/cards";
 import { categoryColorStyle, findCategory } from "../../config/categories";
 import { getPersonName } from "../../config/people";
 import { PLACE_STATUS, STATUS_LABELS } from "../../config/places";
-import { formatLocation, formatLotNumber, formatPrice } from "../../utils/format";
+import { formatLotNumber, formatPrice } from "../../utils/format";
 import { Modal } from "../common/Modal";
 import { SecretMark } from "../secret/SecretMark";
 
@@ -26,7 +26,6 @@ export function PlaceDetailDialog({ place, onClose, onRate, onToggleVisited, onE
   const currentRating = place.rating || 0;
   const detailRows = [
     ["Lote", formatLotNumber(place.lot)],
-    ["Dónde", formatLocation(place)],
     ["Precio", formatPrice(place.price)],
     ["Estado", STATUS_LABELS[place.status]],
   ];

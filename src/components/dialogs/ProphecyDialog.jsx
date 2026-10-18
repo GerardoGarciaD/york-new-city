@@ -11,7 +11,7 @@ function writeProphecy(place) {
   const category = findCategory(place.category);
   return (
     `${pickRandom(TIMES_OF_NIGHT)} bajo ${pickRandom(MOON_PHASES)},\n` +
-    `dos viajeros cruzarán ${place.neighborhood || place.borough}.\n` +
+    `dos viajeros cruzarán York New.\n` +
     `Los espera algo de ${category.name.toLowerCase()} (${category.japaneseName}),\n` +
     `y su nombre es ${place.name}.`
   );

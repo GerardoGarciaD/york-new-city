@@ -1,5 +1,3 @@
-export const BOROUGHS = ["Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island"];
-
 export const PLACE_STATUS = {
   pending: "quiero",
   visited: "fui",
@@ -31,10 +29,10 @@ export const ARENA_GOAL_FLOOR = 200;
 
 /** Places loaded the very first time, so the page doesn't start empty. Delete them from the page anytime. */
 export const EXAMPLE_PLACES = [
-  { id: "ex-joes", name: "Joe's Pizza", category: "pizza", borough: "Manhattan", neighborhood: "Greenwich Village", price: 1, status: "quiero", rating: 0, notes: "Rebanada clásica de queso, para comer de pie.", url: "", isExample: true, lot: 1, proposedBy: "firstPlayer", createdAt: 1 },
-  { id: "ex-katz", name: "Katz's Delicatessen", category: "deli", borough: "Manhattan", neighborhood: "Lower East Side", price: 3, status: "quiero", rating: 0, notes: "Sándwich de pastrami.", url: "", isExample: true, lot: 2, proposedBy: "secondPlayer", createdAt: 2 },
-  { id: "ex-lostacos", name: "Los Tacos No.1", category: "tacos", borough: "Manhattan", neighborhood: "Chelsea Market", price: 1, status: "fui", rating: 5, notes: "Adobada en tortilla de harina.", url: "", isExample: true, lot: 3, proposedBy: "both", createdAt: 3 },
-  { id: "ex-xian", name: "Xi'an Famous Foods", category: "ramen", borough: "Queens", neighborhood: "Flushing", price: 1, status: "quiero", rating: 0, notes: "Fideos de cordero picante.", url: "", isExample: true, lot: 4, proposedBy: "secondPlayer", createdAt: 4 },
-  { id: "ex-russ", name: "Russ & Daughters", category: "brunch", borough: "Manhattan", neighborhood: "Lower East Side", price: 2, status: "quiero", rating: 0, notes: "Bagel con salmón ahumado.", url: "", isExample: true, lot: 5, proposedBy: "firstPlayer", createdAt: 5 },
-  { id: "ex-difara", name: "Di Fara Pizza", category: "pizza", borough: "Brooklyn", neighborhood: "Midwood", price: 2, status: "quiero", rating: 0, notes: "", url: "", isExample: true, lot: 6, proposedBy: "both", createdAt: 6 },
+  { id: "ex-joes", name: "Joe's Pizza", category: "pizza", price: 1, status: "quiero", rating: 0, notes: "Rebanada clásica de queso, para comer de pie.", url: "", isExample: true, lot: 1, proposedBy: "firstPlayer", createdAt: 1 },
+  { id: "ex-katz", name: "Katz's Delicatessen", category: "deli", price: 3, status: "quiero", rating: 0, notes: "Sándwich de pastrami.", url: "", isExample: true, lot: 2, proposedBy: "secondPlayer", createdAt: 2 },
+  { id: "ex-lostacos", name: "Los Tacos No.1", category: "tacos", price: 1, status: "fui", rating: 5, notes: "Adobada en tortilla de harina.", url: "", isExample: true, lot: 3, proposedBy: "both", createdAt: 3 },
+  { id: "ex-xian", name: "Xi'an Famous Foods", category: "ramen", price: 1, status: "quiero", rating: 0, notes: "Fideos de cordero picante.", url: "", isExample: true, lot: 4, proposedBy: "secondPlayer", createdAt: 4 },
+  { id: "ex-russ", name: "Russ & Daughters", category: "brunch", price: 2, status: "quiero", rating: 0, notes: "Bagel con salmón ahumado.", url: "", isExample: true, lot: 5, proposedBy: "firstPlayer", createdAt: 5 },
+  { id: "ex-difara", name: "Di Fara Pizza", category: "pizza", price: 2, status: "quiero", rating: 0, notes: "", url: "", isExample: true, lot: 6, proposedBy: "both", createdAt: 6 },
 ];

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { SELECTABLE_CATEGORIES, categoryColorStyle } from "../../config/categories";
 import { PEOPLE, PLAYER_KEYS, getPersonName } from "../../config/people";
-import { BOROUGHS, PLACE_STATUS, STATUS_LABELS } from "../../config/places";
+import { PLACE_STATUS, STATUS_LABELS } from "../../config/places";
 import { formatPrice, normalizeUrl } from "../../utils/format";
 import { ChipGroup } from "../common/ChipGroup";
 import { CrossTitle } from "../common/CrossTitle";
@@ -28,9 +28,7 @@ function createInitialForm(placeToEdit, defaultCategoryKey, defaultProposer) {
   return {
     name: placeToEdit?.name || "",
     category: placeToEdit?.category || defaultCategoryKey,
-    borough: placeToEdit?.borough || "Manhattan",
-    neighborhood: placeToEdit?.neighborhood || "",
-    price: placeToEdit?.price || 2,
+    price: placeToEdit?.price || null,
     status: placeToEdit?.status || PLACE_STATUS.pending,
     proposedBy: placeToEdit?.proposedBy || defaultProposer,
     url: placeToEdit?.url || "",
@@ -70,7 +68,6 @@ export function PlaceFormDialog({ isOpen, placeToEdit, defaultCategoryKey, defau
     const placeValues = {
       ...formValues,
       name: trimmedName,
-      neighborhood: formValues.neighborhood.trim(),
       notes: formValues.notes.trim(),
       url: normalizeUrl(formValues.url),
     };
@@ -116,37 +113,19 @@ export function PlaceFormDialog({ isOpen, placeToEdit, defaultCategoryKey, defau
           <ChipGroup ariaLabel="Categoría" options={CATEGORY_OPTIONS} selectedValue={formValues.category} onSelect={(value) => updateField("category", value)} />
         </div>
 
-        <div className="grid2">
-          <div className="field">
-            <label htmlFor="place-borough">Borough</label>
-            <select id="place-borough" value={formValues.borough} onChange={(changeEvent) => updateField("borough", changeEvent.target.value)}>
-              {BOROUGHS.map((borough) => (
-                <option key={borough}>{borough}</option>
-              ))}
-            </select>
+        {/* New places start pending and without a price: both are known once they've been there. */}
+        {placeToEdit && (
+          <div className="grid2">
+            <div className="field">
+              <span className="flabel">Precio</span>
+              <ChipGroup ariaLabel="Precio" options={PRICE_OPTIONS} selectedValue={formValues.price} onSelect={(value) => updateField("price", value)} />
+            </div>
+            <div className="field">
+              <span className="flabel">Estado</span>
+              <ChipGroup ariaLabel="Estado" options={STATUS_OPTIONS} selectedValue={formValues.status} onSelect={(value) => updateField("status", value)} />
+            </div>
           </div>
-          <div className="field">
-            <label htmlFor="place-neighborhood">Barrio</label>
-            <input
-              id="place-neighborhood"
-              maxLength={40}
-              placeholder="Ej. West Village"
-              value={formValues.neighborhood}
-              onChange={(changeEvent) => updateField("neighborhood", changeEvent.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="grid2">
-          <div className="field">
-            <span className="flabel">Precio</span>
-            <ChipGroup ariaLabel="Precio" options={PRICE_OPTIONS} selectedValue={formValues.price} onSelect={(value) => updateField("price", value)} />
-          </div>
-          <div className="field">
-            <span className="flabel">Estado</span>
-            <ChipGroup ariaLabel="Estado" options={STATUS_OPTIONS} selectedValue={formValues.status} onSelect={(value) => updateField("status", value)} />
-          </div>
-        </div>
+        )}
 
         <div className="field">
           <span className="flabel">¿Quién lo propuso?</span>
