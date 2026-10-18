@@ -1,0 +1,13 @@
+/* Phone layout and reduced motion. Must load after the rules it overrides. */
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr}
+  .hero .lede{justify-self:start}
+  .nav .stats{display:none}
+  .stage{border-radius:6px;--cw:min(176px,46vw);perspective:1300px}
+  .rows li{grid-template-columns:30px minmax(0,1fr) auto}
+  .rows .st{display:none}
+  .grid2{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}

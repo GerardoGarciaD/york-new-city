@@ -1,0 +1,26 @@
+/* 3D ring of place cards. */
+/* ring */
+.ring-sec{position:relative;padding-block:10px 40px;padding-inline:clamp(16px,4vw,40px)}
+.stage{border-radius:6px;--cw:clamp(190px,21vw,240px);--ch:calc(var(--cw)*1.38);height:calc(var(--ch) + 120px);perspective:1800px;perspective-origin:50% 45%;overflow:hidden;display:grid;place-items:center;touch-action:pan-y;user-select:none;cursor:grab}
+.stage.drag{cursor:grabbing}
+.ring{position:relative;width:var(--cw);height:var(--ch);transform-style:preserve-3d}
+.card{position:absolute;inset:0;border-radius:6px;overflow:hidden;background:var(--c,var(--l-grey));color:var(--t,#fff);display:flex;flex-direction:column;justify-content:space-between;padding:16px;border:0;text-align:left;backface-visibility:hidden;-webkit-backface-visibility:hidden;will-change:transform,opacity;transition:opacity .25s}
+.card::after{content:"";position:absolute;inset:0;background:#000;opacity:var(--dim,0);pointer-events:none}
+.card{border:3px solid var(--ink)!important;border-radius:4px;box-shadow:6px 6px 0 var(--ink)}
+.hanko{position:absolute;right:12px;top:46%;width:62px;height:62px;border-radius:50%;border:3px solid var(--crimson);color:var(--crimson);background:rgba(255,255,255,.88);display:grid;place-items:center;font-family:var(--manga);font-size:13px;line-height:1.05;text-align:center;transform:rotate(-14deg);z-index:2}
+.rank{display:inline-grid;place-items:center;min-width:34px;height:22px;padding:0 6px;border:2px solid currentColor;border-radius:3px;font-family:var(--manga);font-size:12px;letter-spacing:.04em}
+.card .jcat{position:relative;font-family:var(--manga);font-size:11px;letter-spacing:.14em;opacity:.85}
+.card::before{content:"";position:absolute;inset:8px;border:1px solid rgba(255,255,255,.22);border-radius:3px;background:repeating-linear-gradient(-55deg,transparent 0 22px,rgba(255,255,255,.06) 22px 23px);pointer-events:none}
+.card .lot{position:relative;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
+.card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;position:relative}
+.card .big{font-family:var(--manga);font-weight:400;font-size:clamp(70px,8vw,96px);line-height:.8;opacity:.22;position:absolute;right:10px;bottom:44%;pointer-events:none}
+.card h3{position:relative;margin:0;font-family:var(--display);font-weight:900;text-transform:uppercase;font-size:clamp(26px,2.8vw,34px);line-height:.92;text-wrap:balance;overflow-wrap:anywhere;hyphens:auto}
+.card .meta{position:relative;display:flex;justify-content:space-between;align-items:flex-end;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.card .bullet{--c:var(--paper-fixed,#fff);background:rgba(255,255,255,.95);color:#0b0b0c}
+.pill{display:inline-block;padding:3px 8px;border-radius:999px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border:1.5px solid currentColor}
+.card .pill.fui{background:var(--t);color:var(--c);border-color:var(--t)}
+.card.ghost{background:var(--soft);color:var(--muted);border:1.5px dashed var(--line);justify-content:center;align-items:center;text-align:center;gap:10px}
+.card.ghost::before{display:none}
+.card.ghost .plus{font-family:var(--display);font-size:72px;font-weight:900;line-height:.8;color:var(--gold)}
+.card.ghost .gl{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.ring-note{text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}

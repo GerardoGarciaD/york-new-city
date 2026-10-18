@@ -1,0 +1,33 @@
+/* Small visual nods: fishing line, sparks, card suits, banknotes, aura, footer. */
+/* --- Gon: scroll line with a fishing bobber --- */
+.line{position:fixed;right:max(6px,env(safe-area-inset-right,0px));top:0;width:1.5px;height:0;background:var(--ink);opacity:.55;z-index:40;pointer-events:none}
+.bobber{position:fixed;right:max(1px,calc(env(safe-area-inset-right,0px) - 5px));width:12px;height:18px;z-index:41;pointer-events:none;border:2px solid var(--ink);border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:linear-gradient(var(--crimson) 0 50%,#fff 50%);transform:translateY(-50%);animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{50%{margin-top:3px}}
+/* --- Killua: electric crackle when the dial lands --- */
+.zap{position:absolute;inset:-14px;pointer-events:none;overflow:visible}
+.zap polyline{fill:none;stroke:#7fd6ff;stroke-width:2;stroke-linejoin:round;filter:drop-shadow(0 0 3px #7fd6ff);stroke-dasharray:60;stroke-dashoffset:60;animation:zap .5s ease-out forwards}
+.zap polyline:nth-child(2){stroke:#fff;stroke-width:1;animation-delay:.05s}
+@keyframes zap{40%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:-60;opacity:0}}
+.cat-now .bullet{position:relative}
+/* --- Hisoka: playing-card corners and bungee-gum underline --- */
+.card .suit{position:absolute;left:12px;bottom:46px;font-size:15px;line-height:1;z-index:1}
+.card .suit.flip{left:auto;right:12px;top:52px;bottom:auto;transform:rotate(180deg)}
+.rows .nm>span:first-child{background:linear-gradient(#ff7eb6,#ff7eb6) no-repeat 0 100%/0 3px;transition:background-size .5s cubic-bezier(.3,1.8,.4,.9);padding-bottom:2px}
+.rows li:hover .nm>span:first-child,.rows li:focus-visible .nm>span:first-child{background-size:100% 3px}
+/* --- Leorio: prices as small banknotes --- */
+.rows .pr{border:1.5px solid var(--gold);border-radius:3px;padding:2px 7px;color:var(--gold);background:repeating-linear-gradient(45deg,transparent 0 3px,rgba(44,154,70,.10) 3px 4px),var(--paper);box-shadow:inset 0 0 0 2px var(--paper),inset 0 0 0 3px rgba(44,154,70,.45)}
+/* --- Bisky: a gem shine on top ranks --- */
+.rank.gem{position:relative;overflow:hidden}
+.rank.gem::after{content:"";position:absolute;inset:-2px;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.95) 50%,transparent 65%);transform:translateX(-120%);animation:gem 2.6s ease-in-out infinite}
+@keyframes gem{55%,100%{transform:translateX(120%)}}
+/* --- Nen: aura around the card facing you --- */
+.card.aura{outline:2px solid rgba(247,147,30,.0);animation:aura 2.2s ease-in-out infinite}
+@keyframes aura{0%,100%{box-shadow:6px 6px 0 var(--ink),0 0 0 0 rgba(247,147,30,.55)}50%{box-shadow:6px 6px 0 var(--ink),0 0 0 9px rgba(247,147,30,0),0 0 26px 4px rgba(255,194,14,.45)}}
+/* --- Wing: footer with the four steps of 燃 --- */
+.foot{border-top:1.5px solid var(--gold);padding-block:28px 40px;display:grid;gap:14px;justify-items:center;text-align:center}
+.emblems{display:flex;gap:18px;align-items:center;color:var(--ink)}
+.emblems svg{width:30px;height:30px}
+.moe{font-family:var(--manga);font-size:13px;letter-spacing:.3em;color:var(--muted)}
+.moe b{color:var(--crimson);font-weight:400;font-size:1.6em;letter-spacing:0;vertical-align:-.15em}
+.foot small{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.zap{display:none}}

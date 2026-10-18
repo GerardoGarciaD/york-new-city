@@ -1,0 +1,10 @@
+/* Page background, box sizing, layout wrapper and focus ring. */
+body{background-image:radial-gradient(1100px 560px at 85% -12%,rgba(255,194,14,.18),transparent 60%),radial-gradient(900px 520px at -10% 45%,rgba(44,154,70,.10),transparent 60%);background-attachment:fixed}
+
+*{box-sizing:border-box}
+html,body{overflow-x:hidden}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:clamp(16px,4vw,40px)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}

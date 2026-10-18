@@ -1,0 +1,16 @@
+/* List of places and the status filter. */
+/* list */
+.list-sec{border-top:1.5px solid var(--gold);padding-block:20px 60px}
+.list-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.list-head h2{margin:0;font-family:var(--manga);font-weight:400;text-transform:uppercase;font-size:clamp(26px,4.4vw,44px);line-height:1}
+.list-head h2 .tag{display:inline-block;vertical-align:middle;margin-right:10px;background:var(--crimson);color:#fff;font-size:.42em;padding:.35em .5em;border-radius:3px;transform:rotate(-4deg)}
+.seg{display:inline-flex;border:1.5px solid var(--gold);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:7px 14px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.seg button[aria-pressed="true"]{background:var(--gold);color:var(--on-gold)}
+.rows{list-style:none;margin:0;padding:0}
+.rows li{display:grid;grid-template-columns:34px minmax(0,1fr) auto auto;gap:14px;align-items:center;padding-block:14px;border-bottom:1px solid var(--line);cursor:pointer;transition:padding .3s}
+.rows li:hover{padding-left:8px}
+.rows .nm{font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:24px;line-height:1;min-width:0}
+.rows .sub{display:block;font-family:var(--body);text-transform:none;font-size:13px;color:var(--muted);font-weight:400;margin-top:3px}
+.rows .pr{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums}
+.empty{padding:28px 0;color:var(--muted)}

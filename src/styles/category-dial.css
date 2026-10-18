@@ -1,0 +1,39 @@
+/* Chain dividers, speed lines and the rotating category dial. */
+/* dial */
+.dial-sec{padding-block:36px 8px;padding-inline:clamp(16px,4vw,40px);display:grid;justify-items:center;gap:6px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.cat-now{display:flex;align-items:center;gap:12px;min-height:64px;max-width:100%;min-width:0}
+.cat-now>div{min-width:0}
+.cat-now .bullet{width:52px;height:52px;font-size:24px;transition:background .4s}
+.cat-now h2{margin:0;font-family:var(--manga);font-weight:400;text-transform:uppercase;font-size:clamp(24px,6.4vw,56px);line-height:.95;overflow-wrap:anywhere}
+.cat-now .jpn{display:block;font-family:var(--manga);font-size:13px;letter-spacing:.2em;color:var(--crimson);margin-top:4px}
+.lema{margin:-2px 0 4px;font-size:13px;color:var(--muted);font-style:italic;text-align:center;max-width:40ch;text-wrap:balance}
+.cat-now .n{font-family:var(--mono);font-size:12px;color:var(--muted);align-self:flex-start;font-variant-numeric:tabular-nums}
+.chain{height:64px;margin-inline:auto;max-width:1240px;padding-inline:clamp(16px,4vw,40px)}
+.chain canvas{display:block;width:100%;height:100%}
+.speed{position:absolute;inset:-20%;pointer-events:none;background:repeating-conic-gradient(var(--ink) 0 .35deg,transparent .35deg 3.2deg);-webkit-mask:radial-gradient(circle,transparent 38%,#000 75%);mask:radial-gradient(circle,transparent 38%,#000 75%);opacity:0;transition:opacity .35s;z-index:0}
+.speed.go{opacity:.16}
+.dial-sec,.ring-sec{position:relative;overflow:hidden}
+.dial-sec>*:not(.speed),.ring-sec>*:not(.speed){position:relative;z-index:1}
+.dial-view{--size:min(620px,94vw);width:var(--size);height:calc(var(--size)*.36 + 24px);overflow:hidden;position:relative;touch-action:none;user-select:none;margin-top:6px;-webkit-mask-image:linear-gradient(to right,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(to right,transparent,#000 14%,#000 86%,transparent)}
+.dial-view:focus-visible{outline:none}
+.dial-view:focus-visible .dial{box-shadow:0 0 0 2px var(--gold)}
+.pointer{position:absolute;top:0;left:50%;width:2px;height:14px;background:var(--pop);transform:translateX(-50%);z-index:3}
+.pointer::after{content:"";position:absolute;top:12px;left:50%;transform:translateX(-50%);border:7px solid transparent;border-top-color:var(--pop)}
+.dial{position:absolute;left:0;top:38px;width:var(--size);height:var(--size);border-radius:50%;border:1.5px solid var(--gold);cursor:grab;
+  background:repeating-conic-gradient(from -0.5deg,var(--gold) 0 1deg,transparent 1deg 6deg);
+  -webkit-mask:radial-gradient(closest-side,transparent calc(100% - 16px),#000 calc(100% - 15px));
+  mask:radial-gradient(closest-side,transparent calc(100% - 16px),#000 calc(100% - 15px));}
+.dial.snap{transition:transform .7s cubic-bezier(.2,.9,.15,1)}
+.dial-items{position:absolute;left:0;top:38px;width:var(--size);height:var(--size);pointer-events:none}
+.dial-items.snap{transition:transform .7s cubic-bezier(.2,.9,.15,1)}
+.d-item{position:absolute;left:50%;top:50%;width:0;height:0;pointer-events:auto}
+.d-item button{position:absolute;left:0;top:0;transform:translate(-50%,-50%);background:none;border:0;padding:6px;display:grid;justify-items:center;gap:6px;transition:opacity .3s,transform .3s}
+.d-item .jl{font-family:var(--manga);font-size:10px;letter-spacing:.1em;color:var(--crimson)}
+.d-item .lbl{font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:clamp(14px,2.4vw,19px);letter-spacing:.02em;white-space:nowrap}
+.d-item[aria-current="true"] button{transform:translate(-50%,-50%) scale(1.15)}
+.d-item .lbl,.d-item .jl{transition:opacity .3s,transform .3s;background:var(--paper);padding:1px 6px;border-radius:3px}
+.d-item[aria-current="false"] .lbl,.d-item[aria-current="false"] .jl{opacity:0;transform:translateY(-6px)}
+.d-item[aria-current="false"] button{opacity:.6}
+.dial-hint{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;gap:14px;align-items:center}
+.dial-hint button{border:1.5px solid var(--line);background:var(--paper);color:var(--gold);border-radius:50%;width:34px;height:34px;display:grid;place-items:center;font-size:14px}

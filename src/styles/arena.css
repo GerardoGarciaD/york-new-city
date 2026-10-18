@@ -1,0 +1,6 @@
+/* Heavens Arena progress bar. */
+.arena{display:grid;gap:6px;margin:14px 0 8px;max-width:520px}
+.arena .top{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.arena .top b{font-family:var(--manga);font-weight:400;font-size:15px;letter-spacing:.02em;color:var(--ink);text-transform:none}
+.arena .bar{height:12px;border:2px solid var(--ink);border-radius:2px;background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 2px),var(--line) calc(10% - 2px) 10%)}
+.arena .bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .8s cubic-bezier(.2,.9,.15,1)}

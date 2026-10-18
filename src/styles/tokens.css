@@ -1,0 +1,14 @@
+/* Design tokens: colors, fonts and category colors. */
+/* Layout: bright adventure-manga page in one deliberate light look: giant condensed headline, a green category dial that turns, a 3D ring of "lot" cards that spins, then a plain list to scan. */
+:root{
+  color-scheme:light;
+  --paper:#fbfbf5; --ink:#151612; --muted:#666a5e; --line:#e1e4d6; --soft:#f0f3e4; --overlay:rgba(21,22,18,.45);
+  --gold:#2c9a46; --gold-hi:#35b152; --crimson:#e2382b; --on-gold:#ffffff;
+  --pop:#f7931e; --sun:#ffc20e;
+  --manga:"Dela Gothic One","Hiragino Kaku Gothic Std","Yu Gothic",Impact,sans-serif;
+  --display:"Big Shoulders Display","Arial Narrow","Helvetica Neue Condensed",Impact,sans-serif;
+  --body:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --l-red:#e2382b; --l-orange:#f7931e; --l-green:#2c9a46; --l-yellow:#ffc20e; --l-blue:#2e7fd6;
+  --l-purple:#8a46b0; --l-brown:#a3572e; --l-lime:#8cc63f; --l-grey:#3d4a3f; --l-teal:#13a3a0;
+}

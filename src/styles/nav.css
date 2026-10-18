@@ -1,0 +1,19 @@
+/* Top navigation bar and the globe with the orbiting title. */
+/* nav */
+.nav{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:18px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.nav .brand{display:flex;align-items:center;gap:10px;font-weight:500}
+.orb{position:relative;width:104px;height:64px;display:grid;place-items:center;flex:none}
+.earth{position:relative;width:40px;height:40px;z-index:1}
+.aura-ring{position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;animation:orbAura 2.6s ease-in-out infinite;z-index:0}
+@keyframes orbAura{0%,100%{box-shadow:0 0 0 0 rgba(247,147,30,.5)}50%{box-shadow:0 0 0 7px rgba(247,147,30,0),0 0 16px 3px rgba(255,194,14,.45)}}
+.orb .orbit{position:absolute;left:50%;top:50%;transform:rotateX(-20deg) rotateZ(-14deg);transform-style:preserve-3d;perspective:none;z-index:2}
+.orb{perspective:600px}
+.ring-text{position:absolute;left:0;top:0;transform-style:preserve-3d;animation:orbSpin 12s linear infinite}
+.ring-text span{position:absolute;left:0;top:0;width:12px;margin:-8px 0 0 -6px;text-align:center;font:500 11px/16px var(--mono);color:var(--ink);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.ring-text span.k{font-family:var(--manga);font-weight:400;color:var(--crimson)}
+@keyframes orbSpin{to{transform:rotateY(-360deg)}}
+@media (prefers-reduced-motion:reduce){.ring-text,.aura-ring{animation:none}}
+.nav .stats{color:var(--muted);font-variant-numeric:tabular-nums}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--gold);background:var(--gold);color:var(--on-gold);padding:10px 16px;border-radius:999px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.btn:hover{transform:translateY(-2px);background:var(--gold-hi);border-color:var(--gold-hi)}
+.btn.ghost{background:transparent;color:var(--gold)}
