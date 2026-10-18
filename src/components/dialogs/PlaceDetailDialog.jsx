@@ -6,6 +6,7 @@ import { PLACE_STATUS, STATUS_LABELS } from "../../config/places";
 import { formatLotNumber, formatPrice } from "../../utils/format";
 import { Modal } from "../common/Modal";
 import { SecretMark } from "../secret/SecretMark";
+import { PlaceMap } from "./PlaceMap";
 
 const MAX_RATING = 5;
 const LINK_PREVIEW_LENGTH = 48;
@@ -26,6 +27,7 @@ export function PlaceDetailDialog({ place, onClose, onRate, onToggleVisited, onE
   const currentRating = place.rating || 0;
   const detailRows = [
     ["Lote", formatLotNumber(place.lot)],
+    ...(place.location ? [["Ubicación", place.location]] : []),
     ["Precio", formatPrice(place.price)],
     ["Estado", STATUS_LABELS[place.status]],
   ];
@@ -70,6 +72,8 @@ export function PlaceDetailDialog({ place, onClose, onRate, onToggleVisited, onE
             </>
           )}
         </dl>
+
+        {(place.location || place.mapsLink) && <PlaceMap place={place} />}
 
         <div className="field">
           <span className="flabel">

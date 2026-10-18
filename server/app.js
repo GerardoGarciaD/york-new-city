@@ -1,14 +1,16 @@
 import { Hono } from "hono";
 import { createToken, readToken, verifyPassword } from "./auth.js";
 import { db, ensureTables } from "./db.js";
+import { isGoogleMapsLink, resolveMapLink } from "./mapsLink.js";
 
 /**
  * The API. Same code runs locally (server/dev.js) and on Vercel (api/index.js).
- *   POST   /api/login        { player, password } -> { token, player }
- *   GET    /api/places       -> list
- *   POST   /api/places       placeData -> created place
- *   PATCH  /api/places/:id   changes -> updated place
+ *   POST   /api/login         { player, password } -> { token, player }
+ *   GET    /api/places        -> list
+ *   POST   /api/places        placeData -> created place
+ *   PATCH  /api/places/:id    changes -> updated place
  *   DELETE /api/places/:id
+ *   POST   /api/maps/resolve  { url } -> { location, coordinates } from a Google Maps link
  */
 export const app = new Hono().basePath("/api");
 
@@ -52,13 +54,24 @@ app.post("/login", async (c) => {
   return c.json({ token: createToken(player), player });
 });
 
-// Everything below needs a valid token.
-app.use("/places/*", async (c, next) => {
+async function requirePlayer(c, next) {
   const token = c.req.header("Authorization")?.replace(/^Bearer /, "");
   const player = readToken(token);
   if (!player) return c.json({ error: "Sesión vencida" }, 401);
   c.set("player", player);
   await next();
+}
+
+// Everything below needs a valid token.
+app.use("/places/*", requirePlayer);
+app.use("/maps/*", requirePlayer);
+
+app.post("/maps/resolve", async (c) => {
+  const { url } = await c.req.json().catch(() => ({}));
+  if (typeof url !== "string" || !isGoogleMapsLink(url.trim())) return c.json({ error: "Ese no es un link de Google Maps" }, 400);
+  const resolvedPlace = await resolveMapLink(url.trim()).catch(() => null);
+  if (!resolvedPlace) return c.json({ error: "No pudimos leer ese link" }, 422);
+  return c.json(resolvedPlace);
 });
 
 app.get("/places", async (c) => {

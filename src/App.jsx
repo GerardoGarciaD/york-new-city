@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CATEGORIES, findCategoryIndex } from "./config/categories";
 import { PEOPLE } from "./config/people";
 import { PLACE_STATUS, isSharedPlace } from "./config/places";
@@ -6,6 +6,7 @@ import { useToast } from "./context/ToastContext";
 import { usePlaces } from "./hooks/usePlaces";
 import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
 import { useSession } from "./hooks/useSession";
+import { resolveMapLink } from "./services/api";
 import { CategoryDial } from "./components/dial/CategoryDial";
 import { JajankenDialog } from "./components/dialogs/JajankenDialog";
 import { PlaceDetailDialog } from "./components/dialogs/PlaceDetailDialog";
@@ -38,6 +39,7 @@ export default function App() {
   const prefersReducedMotion = usePrefersReducedMotion();
   const { currentPlayer, token, checkPassword, logIn, logOut } = useSession();
   const { places, isLoaded, nextLotNumber, addPlace, updatePlace, removePlace } = usePlaces({ token, onUnauthorized: logOut });
+  const readMapLink = useCallback((url) => resolveMapLink(url, token), [token]);
 
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(0);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -205,6 +207,7 @@ export default function App() {
           defaultCategoryKey={selectedCategory.key !== "all" ? selectedCategory.key : "pizza"}
           defaultProposer={currentPlayer || "both"}
           onSave={handleSavePlace}
+          onResolveMapLink={readMapLink}
           onClose={closeDialog}
         />
         <PlaceDetailDialog
