@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { SELECTABLE_CATEGORIES, categoryColorStyle } from "../../config/categories";
-import { PEOPLE } from "../../config/people";
+import { PEOPLE, PLAYER_KEYS, getPersonName } from "../../config/people";
 import { BOROUGHS, PLACE_STATUS, STATUS_LABELS } from "../../config/places";
 import { formatPrice, normalizeUrl } from "../../utils/format";
 import { ChipGroup } from "../common/ChipGroup";
@@ -35,12 +35,14 @@ function createInitialForm(placeToEdit, defaultCategoryKey, defaultProposer) {
     proposedBy: placeToEdit?.proposedBy || defaultProposer,
     url: placeToEdit?.url || "",
     notes: placeToEdit?.notes || "",
+    isSecret: false,
   };
 }
 
 /**
  * Add or edit a place.
  * placeToEdit: the place being edited, or null to add a new one.
+ * defaultProposer: who is logged in; a secret is always theirs.
  * onSave(formValues) should return a promise.
  */
 export function PlaceFormDialog({ isOpen, placeToEdit, defaultCategoryKey, defaultProposer, onSave, onClose }) {
@@ -65,21 +67,26 @@ export function PlaceFormDialog({ isOpen, placeToEdit, defaultCategoryKey, defau
     submitEvent.preventDefault();
     const trimmedName = formValues.name.trim();
     if (!trimmedName) return;
+    const placeValues = {
+      ...formValues,
+      name: trimmedName,
+      neighborhood: formValues.neighborhood.trim(),
+      notes: formValues.notes.trim(),
+      url: normalizeUrl(formValues.url),
+    };
+    // Only new places can be sealed; editing never touches the secret.
+    if (placeToEdit) delete placeValues.isSecret;
+    else if (placeValues.isSecret) placeValues.proposedBy = defaultProposer;
     setIsSaving(true);
     try {
-      await onSave({
-        ...formValues,
-        name: trimmedName,
-        neighborhood: formValues.neighborhood.trim(),
-        notes: formValues.notes.trim(),
-        url: normalizeUrl(formValues.url),
-      });
+      await onSave(placeValues);
     } finally {
       setIsSaving(false);
     }
   }
 
   const titleWords = placeToEdit ? ["Editar", "Este", "Lote"] : ["Nuevo", "Lugar", "A cazar"];
+  const otherPlayerName = getPersonName(PLAYER_KEYS.find((playerKey) => playerKey !== defaultProposer));
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} labelledBy="placeFormTitle">
@@ -143,7 +150,11 @@ export function PlaceFormDialog({ isOpen, placeToEdit, defaultCategoryKey, defau
 
         <div className="field">
           <span className="flabel">¿Quién lo propuso?</span>
-          <ChipGroup ariaLabel="¿Quién lo propuso?" options={PROPOSER_OPTIONS} selectedValue={formValues.proposedBy} onSelect={(value) => updateField("proposedBy", value)} />
+          {formValues.isSecret ? (
+            <span className="secret-proposer">Lo propones tú, {getPersonName(defaultProposer)}. Los secretos son de quien los guarda.</span>
+          ) : (
+            <ChipGroup ariaLabel="¿Quién lo propuso?" options={PROPOSER_OPTIONS} selectedValue={formValues.proposedBy} onSelect={(value) => updateField("proposedBy", value)} />
+          )}
         </div>
 
         <div className="field">
@@ -162,6 +173,21 @@ export function PlaceFormDialog({ isOpen, placeToEdit, defaultCategoryKey, defau
             onChange={(changeEvent) => updateField("notes", changeEvent.target.value)}
           />
         </div>
+
+        {!placeToEdit && (
+          <label className="secret-toggle">
+            <input type="checkbox" checked={formValues.isSecret} onChange={(changeEvent) => updateField("isSecret", changeEvent.target.checked)} />
+            <span className="secret-toggle-seal" aria-hidden="true">
+              秘
+            </span>
+            <span>
+              <b>Guardar como secreto · 秘密</b>
+              <span className="secret-toggle-note">
+                Solo tú lo verás. Para {otherPlayerName} será un lote sellado hasta que lo reveles, cuando estén juntos.
+              </span>
+            </span>
+          </label>
+        )}
 
         <div className="actions">
           <button type="button" className="btn ghost" onClick={onClose}>

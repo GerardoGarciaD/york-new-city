@@ -16,6 +16,15 @@ export const STATUS_FILTERS = [
   { value: PLACE_STATUS.visited, label: "Visitados" },
 ];
 
+/**
+ * Secret places (秘密) stay out of the prophecy, the arena and the visited count until revealed,
+ * for both travelers, so neither screen gives the surprise away.
+ * A place with isSealed is someone else's secret: the server only sent its lot number and owner.
+ */
+export function isSharedPlace(place) {
+  return !place.isSecret;
+}
+
 /** Heavens Arena: each visited place climbs this many floors, up to the goal. */
 export const ARENA_FLOORS_PER_VISIT = 10;
 export const ARENA_GOAL_FLOOR = 200;

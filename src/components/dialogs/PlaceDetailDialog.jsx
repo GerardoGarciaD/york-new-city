@@ -5,13 +5,14 @@ import { getPersonName } from "../../config/people";
 import { PLACE_STATUS, STATUS_LABELS } from "../../config/places";
 import { formatLocation, formatLotNumber, formatPrice } from "../../utils/format";
 import { Modal } from "../common/Modal";
+import { SecretMark } from "../secret/SecretMark";
 
 const MAX_RATING = 5;
 const LINK_PREVIEW_LENGTH = 48;
 const STAR_VALUES = [1, 2, 3, 4, 5];
 
-/** Full view of a place: details, rating, mark as visited, edit and delete. */
-export function PlaceDetailDialog({ place, onClose, onRate, onToggleVisited, onEdit, onDelete }) {
+/** Full view of a place: details, rating, mark as visited, edit and delete. Your own secrets also get "Revelar". */
+export function PlaceDetailDialog({ place, onClose, onRate, onToggleVisited, onEdit, onDelete, onReveal }) {
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const isOpen = Boolean(place);
 
@@ -49,6 +50,7 @@ export function PlaceDetailDialog({ place, onClose, onRate, onToggleVisited, onE
           {place.isExample && " · ejemplo"}
         </span>
         <h3 id="placeDetailTitle">{place.name}</h3>
+        {place.isSecret && <SecretMark />}
       </div>
       <div className="dlg">
         <dl className="kv">
@@ -97,6 +99,11 @@ export function PlaceDetailDialog({ place, onClose, onRate, onToggleVisited, onE
             {isConfirmingDelete ? "Toca otra vez para borrar" : "Borrar"}
           </button>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {place.isSecret && (
+              <button type="button" className="btn reveal" onClick={() => onReveal(place)}>
+                Revelar · 秘
+              </button>
+            )}
             <button type="button" className="btn ghost" onClick={() => onEdit(place)}>
               Editar
             </button>

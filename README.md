@@ -21,6 +21,7 @@ En local la base de datos es un archivo (`server/data/yorknew.db`), no necesitas
 - **Base de datos** SQLite: un archivo en local, [Turso](https://turso.tech) en internet. Dos tablas: `users` (los dos viajeros) y `places` (cada lugar guardado como JSON).
 - No hay registro: los usuarios se crean con `yarn db:user`. El mismo comando cambia la contraseña. Si quieren una sola contraseña, pónganle la misma a los dos.
 - Cada teléfono vuelve a pedir la lista cada 15 segundos y al regresar a la pestaña, así ven lo que agregó el otro.
+- **Lugares secretos (秘密)**: al agregar un lugar se puede "Guardar como secreto". La API solo le manda al otro el número de lote y de quién es, así que ve un lote sellado. Solo quien lo creó puede revelarlo. Hasta entonces no cuenta para la profecía, la arena ni los visitados. Componentes en `src/components/secret/`, estilos en `src/styles/secret-place.css`.
 
 ## Publicarlo para usarlo en los dos celulares
 

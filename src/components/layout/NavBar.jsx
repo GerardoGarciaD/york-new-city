@@ -12,7 +12,7 @@ export function NavBar({ statsText, isLoggedIn, onLogOut, onAddPlace }) {
           Salir
         </button>
         <button className="btn" type="button" onClick={onAddPlace}>
-          + Agregar a la lista
+          + Agregar
         </button>
       </div>
     </header>

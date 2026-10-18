@@ -39,13 +39,9 @@ export function Hero() {
         ))}
       </h1>
       <div className="lede">
-        <small>Dos gourmet hunters · 二人旅</small>
+        <small>Gourmet hunters · 二人旅</small>
         <p className="kicker">
           <CrossTitle words={["Comer", "Y", "Explorar"]} />
-        </p>
-        <p>
-          A dónde vamos a comer. Nuestra lista de antojos para el viaje. Giramos el dial, elegimos y vamos. Toca un
-          lugar para ver las notas o marcar que visitamos.
         </p>
       </div>
     </section>

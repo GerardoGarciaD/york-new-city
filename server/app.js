@@ -20,6 +20,16 @@ function rowToPlace(row) {
   return { ...JSON.parse(row.data), id: row.id };
 }
 
+function isHiddenFrom(place, player) {
+  return Boolean(place.isSecret) && place.secretOwner !== player;
+}
+
+/** A secret place that isn't yours arrives as a sealed lot: no name, category, notes, link or status. */
+function toVisiblePlace(place, player) {
+  if (!isHiddenFrom(place, player)) return place;
+  return { id: place.id, lot: place.lot, createdAt: place.createdAt, secretOwner: place.secretOwner, isSecret: true, isSealed: true };
+}
+
 async function findPlace(placeId) {
   const result = await db.execute({ sql: "SELECT id, data FROM places WHERE id = ?", args: [placeId] });
   return result.rows[0] ? rowToPlace(result.rows[0]) : null;
@@ -53,11 +63,16 @@ app.use("/places/*", async (c, next) => {
 
 app.get("/places", async (c) => {
   const result = await db.execute("SELECT id, data FROM places ORDER BY created_at");
-  return c.json(result.rows.map(rowToPlace));
+  return c.json(result.rows.map((row) => toVisiblePlace(rowToPlace(row), c.get("player"))));
 });
 
 app.post("/places", async (c) => {
-  const { id: _ignoredId, ...placeData } = await c.req.json();
+  const { id: _ignoredId, isSealed: _ignoredSealed, secretOwner: _ignoredOwner, ...requestedData } = await c.req.json();
+  const player = c.get("player");
+  // The owner of a secret is whoever is logged in, never what the form says.
+  const placeData = requestedData.isSecret
+    ? { ...requestedData, isSecret: true, secretOwner: player, proposedBy: player }
+    : { ...requestedData, isSecret: false };
   const place = { ...placeData, id: createId() };
   await db.execute({
     sql: "INSERT INTO places (id, data, created_at) VALUES (?, ?, ?)",
@@ -70,14 +85,20 @@ app.patch("/places/:id", async (c) => {
   const placeId = c.req.param("id");
   const currentPlace = await findPlace(placeId);
   if (!currentPlace) return c.json({ error: "No existe" }, 404);
+  if (isHiddenFrom(currentPlace, c.get("player"))) return c.json({ error: "Este lote está sellado" }, 403);
 
-  const { id: _ignoredId, ...changes } = await c.req.json();
+  const { id: _ignoredId, isSealed: _ignoredSealed, secretOwner: _ignoredOwner, isSecret, ...changes } = await c.req.json();
+  // A secret can be revealed (isSecret: false) but nothing can become secret after it was created.
+  if (isSecret === false) changes.isSecret = false;
   const { id: _sameId, ...updatedData } = { ...currentPlace, ...changes };
   await db.execute({ sql: "UPDATE places SET data = ? WHERE id = ?", args: [JSON.stringify(updatedData), placeId] });
   return c.json({ ...updatedData, id: placeId });
 });
 
 app.delete("/places/:id", async (c) => {
-  await db.execute({ sql: "DELETE FROM places WHERE id = ?", args: [c.req.param("id")] });
+  const placeId = c.req.param("id");
+  const currentPlace = await findPlace(placeId);
+  if (currentPlace && isHiddenFrom(currentPlace, c.get("player"))) return c.json({ error: "Este lote está sellado" }, 403);
+  await db.execute({ sql: "DELETE FROM places WHERE id = ?", args: [placeId] });
   return c.body(null, 204);
 });

@@ -1,11 +1,16 @@
-import { PLACE_STATUS, STATUS_FILTERS } from "../../config/places";
+import { PLACE_STATUS, STATUS_FILTERS, isSharedPlace } from "../../config/places";
 import { ChapterHeading } from "../common/ChapterHeading";
 import { CrossTitle } from "../common/CrossTitle";
+import { SealedPlaceRow } from "../secret/SealedPlaceRow";
 import { ArenaProgress } from "./ArenaProgress";
 import { PlaceRow } from "./PlaceRow";
 
-/** Pending places first, then alphabetical. */
+/** Pending places first, then alphabetical. Sealed lots go last, by lot number. */
 function sortPlaces(firstPlace, secondPlace) {
+  if (firstPlace.isSealed || secondPlace.isSealed) {
+    if (firstPlace.isSealed && secondPlace.isSealed) return (firstPlace.lot || 0) - (secondPlace.lot || 0);
+    return firstPlace.isSealed ? 1 : -1;
+  }
   if (firstPlace.status !== secondPlace.status) return firstPlace.status === PLACE_STATUS.pending ? -1 : 1;
   return String(firstPlace.name).localeCompare(secondPlace.name);
 }
@@ -13,7 +18,7 @@ function sortPlaces(firstPlace, secondPlace) {
 const EMPTY_ROW_STYLE = { display: "block", cursor: "default" };
 
 export function PlaceListSection({ places, isLoaded, statusFilter, onChangeStatusFilter, onOpenPlace }) {
-  const visitedCount = places.filter((place) => place.status === PLACE_STATUS.visited).length;
+  const visitedCount = places.filter((place) => isSharedPlace(place) && place.status === PLACE_STATUS.visited).length;
   const filteredPlaces = places.filter((place) => statusFilter === "all" || place.status === statusFilter).sort(sortPlaces);
 
   let listContent;
@@ -26,11 +31,14 @@ export function PlaceListSection({ places, isLoaded, statusFilter, onChangeStatu
   } else if (filteredPlaces.length === 0) {
     listContent = (
       <li className="empty" style={EMPTY_ROW_STYLE}>
-        {places.length ? "Nada con este filtro." : "Todavía no hay nada. ¿Qué se nos antoja? Usen “+ Agregar a la lista”."}
+        {places.length ? "Nada con este filtro." : "Todavía no hay nada. ¿Qué se nos antoja? Usen “+ Agregar”."}
       </li>
     );
   } else {
-    listContent = filteredPlaces.map((place) => <PlaceRow key={place.id} place={place} onOpen={() => onOpenPlace(place.id)} />);
+    listContent = filteredPlaces.map((place) => {
+      const RowComponent = place.isSealed ? SealedPlaceRow : PlaceRow;
+      return <RowComponent key={place.id} place={place} onOpen={() => onOpenPlace(place.id)} />;
+    });
   }
 
   return (

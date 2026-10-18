@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CATEGORIES, findCategoryIndex } from "./config/categories";
 import { PEOPLE } from "./config/people";
-import { PLACE_STATUS } from "./config/places";
+import { PLACE_STATUS, isSharedPlace } from "./config/places";
 import { useToast } from "./context/ToastContext";
 import { usePlaces } from "./hooks/usePlaces";
 import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
@@ -20,6 +20,8 @@ import { SiteFooter } from "./components/layout/SiteFooter";
 import { PlaceListSection } from "./components/list/PlaceListSection";
 import { LoginGate } from "./components/login/LoginGate";
 import { PlaceRing } from "./components/ring/PlaceRing";
+import { RevealAnimation } from "./components/secret/RevealAnimation";
+import { SealedPlaceDialog } from "./components/secret/SealedPlaceDialog";
 
 /** Which dialog is open. Only one at a time. */
 const DIALOGS = {
@@ -42,6 +44,7 @@ export default function App() {
   const [openDialog, setOpenDialog] = useState(DIALOGS.none);
   const [detailPlaceId, setDetailPlaceId] = useState(null);
   const [placeToEdit, setPlaceToEdit] = useState(null);
+  const [revealingPlace, setRevealingPlace] = useState(null);
 
   const pageRef = useRef(null);
   const ringSectionRef = useRef(null);
@@ -49,9 +52,12 @@ export default function App() {
   const selectedCategory = CATEGORIES[selectedCategoryIndex];
   const isInSelectedCategory = (place) => selectedCategory.key === "all" || place.category === selectedCategory.key;
   const placesInCategory = places.filter(isInSelectedCategory);
-  const pendingPlaces = places.filter((place) => place.status !== PLACE_STATUS.visited);
-  const visitedCount = places.length - pendingPlaces.length;
+  const sharedPlaces = places.filter(isSharedPlace);
+  const pendingPlaces = sharedPlaces.filter((place) => place.status !== PLACE_STATUS.visited);
+  const visitedCount = sharedPlaces.length - pendingPlaces.length;
   const detailPlace = openDialog === DIALOGS.placeDetail ? places.find((place) => place.id === detailPlaceId) || null : null;
+  const sealedDetailPlace = detailPlace?.isSealed ? detailPlace : null;
+  const openDetailPlace = detailPlace?.isSealed ? null : detailPlace;
 
   const statsText = isLoaded ? `${places.length} en la lista · ${visitedCount} visitados` : "Cargando la lista";
   const isLoggedIn = Boolean(currentPlayer);
@@ -94,7 +100,7 @@ export default function App() {
         showToast("Cambios guardados");
       } else {
         await addPlace({ ...formValues, lot: nextLotNumber, rating: 0, createdAt: Date.now() });
-        showToast(`いただきます · ${formValues.name} va a la lista`);
+        showToast(formValues.isSecret ? `秘密 · ${formValues.name} quedó sellado` : `いただきます · ${formValues.name} va a la lista`);
         selectCategoryByKey(formValues.category);
       }
       closeDialog();
@@ -129,6 +135,22 @@ export default function App() {
     } catch {
       showToast("No se pudo borrar");
     }
+  }
+
+  async function handleRevealPlace(place) {
+    try {
+      await updatePlace(place.id, { isSecret: false });
+      closeDialog();
+      if (prefersReducedMotion) showToast(`ドン · ${place.name} ya es de los dos`);
+      else setRevealingPlace({ ...place, isSecret: false });
+    } catch {
+      showToast("No se pudo revelar. Intenten de nuevo");
+    }
+  }
+
+  function handleRevealDone() {
+    showToast(`ドン · ${revealingPlace.name} ya es de los dos`);
+    setRevealingPlace(null);
   }
 
   function handleShowCategoryFromCup(categoryKey) {
@@ -186,13 +208,15 @@ export default function App() {
           onClose={closeDialog}
         />
         <PlaceDetailDialog
-          place={detailPlace}
+          place={openDetailPlace}
           onClose={closeDialog}
           onRate={handleRatePlace}
           onToggleVisited={handleToggleVisited}
           onEdit={(place) => openPlaceForm(place)}
           onDelete={handleDeletePlace}
+          onReveal={handleRevealPlace}
         />
+        <SealedPlaceDialog place={sealedDetailPlace} onClose={closeDialog} />
         <ProphecyDialog
           isOpen={openDialog === DIALOGS.prophecy}
           candidatePlaces={pendingPlaces.filter(isInSelectedCategory)}
@@ -209,6 +233,7 @@ export default function App() {
         />
       </div>
 
+      {revealingPlace && <RevealAnimation place={revealingPlace} onDone={handleRevealDone} />}
       {!isLoggedIn && <LoginGate checkPassword={checkPassword} onAuthenticated={handleAuthenticated} />}
     </>
   );

@@ -8,6 +8,7 @@ export function PlaceRow({ place, onOpen }) {
   const detailParts = [formatLocation(place)];
   if (place.proposedBy) detailParts.push(getPersonName(place.proposedBy));
   if (place.isExample) detailParts.push("ejemplo");
+  if (place.isSecret) detailParts.push("秘 solo tú lo ves");
 
   function handleKeyDown(keyboardEvent) {
     if (keyboardEvent.key === "Enter") onOpen();

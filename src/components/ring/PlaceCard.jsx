@@ -4,8 +4,9 @@ import { categoryColorStyle, findCategory, findCategoryIndex } from "../../confi
 import { getPersonName } from "../../config/people";
 import { PLACE_STATUS, STATUS_LABELS } from "../../config/places";
 import { formatLotNumber, formatPrice } from "../../utils/format";
+import { SecretMark } from "../secret/SecretMark";
 
-/** One "lot" card in the 3D ring. */
+/** One "lot" card in the 3D ring. Your own secrets get the 秘 mark. */
 export const PlaceCard = forwardRef(function PlaceCard({ place, onOpen }, cardRef) {
   const category = findCategory(place.category);
   const isVisited = place.status === PLACE_STATUS.visited;
@@ -16,7 +17,7 @@ export const PlaceCard = forwardRef(function PlaceCard({ place, onOpen }, cardRe
     <button
       ref={cardRef}
       type="button"
-      className="card"
+      className={`card${place.isSecret ? " is-secret" : ""}`}
       style={categoryColorStyle(category)}
       aria-label={`${place.name}, ${place.neighborhood || place.borough}`}
       onClick={onOpen}
@@ -36,6 +37,7 @@ export const PlaceCard = forwardRef(function PlaceCard({ place, onOpen }, cardRe
         Lote {formatLotNumber(place.lot)}
         {proposerName && ` · ${proposerName}`}
       </span>
+      {place.isSecret && <SecretMark />}
       <span className="big" aria-hidden="true">
         {category.kanji}
       </span>

@@ -3,6 +3,7 @@ import { MAX_CARDS_IN_RING } from "../../config/cards";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { ChapterHeading } from "../common/ChapterHeading";
 import { CrossTitle } from "../common/CrossTitle";
+import { SealedPlaceCard } from "../secret/SealedPlaceCard";
 import { EmptyCard, PlaceCard } from "./PlaceCard";
 
 const NARROW_SCREEN_PX = 760;
@@ -44,7 +45,7 @@ export function PlaceRing({ places, categoryKey, isLoaded, onOpenPlace, onAddPla
   const visiblePlaces = places.slice(0, MAX_CARDS_IN_RING);
   const slotCount = Math.max(visiblePlaces.length + 1, isNarrow ? MIN_SLOTS_NARROW : MIN_SLOTS_WIDE);
   const emptySlotCount = slotCount - visiblePlaces.length;
-  const contentSignature = `${categoryKey}|${isLoaded}|${visiblePlaces.map((place) => `${place.id}:${place.status}:${place.rating}`).join(",")}`;
+  const contentSignature = `${categoryKey}|${isLoaded}|${visiblePlaces.map((place) => `${place.id}:${place.status}:${place.rating}:${place.isSecret}`).join(",")}`;
 
   /** Places every card around the ring and shades the ones turned away from us. */
   function paintRing() {
@@ -205,16 +206,19 @@ export function PlaceRing({ places, categoryKey, isLoaded, onOpenPlace, onAddPla
         }}
       >
         <div className="ring" ref={ringRef}>
-          {visiblePlaces.map((place, placeIndex) => (
-            <PlaceCard
-              key={place.id}
-              ref={(cardElement) => {
-                cardElementsRef.current[placeIndex] = cardElement;
-              }}
-              place={place}
-              onOpen={onlyIfNotDragged(() => onOpenPlace(place.id))}
-            />
-          ))}
+          {visiblePlaces.map((place, placeIndex) => {
+            const CardComponent = place.isSealed ? SealedPlaceCard : PlaceCard;
+            return (
+              <CardComponent
+                key={place.id}
+                ref={(cardElement) => {
+                  cardElementsRef.current[placeIndex] = cardElement;
+                }}
+                place={place}
+                onOpen={onlyIfNotDragged(() => onOpenPlace(place.id))}
+              />
+            );
+          })}
           {[...Array(emptySlotCount).keys()].map((emptyIndex) => (
             <EmptyCard
               key={`empty-${emptyIndex}`}
