@@ -48,7 +48,7 @@ function LicenseFront() {
             EXPEDIDA<b>17·10·26</b>
           </span>
           <span>
-            DESTINO<b>NYC</b>
+            DESTINO<b>YNC</b>
           </span>
           <span>
             RANGO<b>SS</b>
