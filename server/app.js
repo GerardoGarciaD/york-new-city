@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { createToken, readToken, verifyPassword } from "./auth.js";
 import { db, ensureTables } from "./db.js";
+import { geocodeLocation } from "./geocode.js";
 import { isGoogleMapsLink, resolveMapLink } from "./mapsLink.js";
 
 /**
@@ -79,13 +80,24 @@ app.get("/places", async (c) => {
   return c.json(result.rows.map((row) => toVisiblePlace(rowToPlace(row), c.get("player"))));
 });
 
+/**
+ * Point for the Gourmet Map. A pasted Google Maps link already brings exact coordinates;
+ * otherwise the typed location is searched (only when it changed, so editing a rating stays fast).
+ */
+async function withSearchedCoordinates(placeData, previousPlace = null) {
+  if (placeData.coordinates || !placeData.location) return { ...placeData, searchedCoordinates: null };
+  if (previousPlace?.searchedCoordinates && previousPlace.location === placeData.location) return placeData;
+  return { ...placeData, searchedCoordinates: await geocodeLocation(placeData.location) };
+}
+
 app.post("/places", async (c) => {
-  const { id: _ignoredId, isSealed: _ignoredSealed, secretOwner: _ignoredOwner, ...requestedData } = await c.req.json();
+  const { id: _ignoredId, isSealed: _ignoredSealed, secretOwner: _ignoredOwner, searchedCoordinates: _ignoredPoint, ...requestedData } = await c.req.json();
   const player = c.get("player");
   // The owner of a secret is whoever is logged in, never what the form says.
-  const placeData = requestedData.isSecret
+  const ownedData = requestedData.isSecret
     ? { ...requestedData, isSecret: true, secretOwner: player, proposedBy: player }
     : { ...requestedData, isSecret: false };
+  const placeData = await withSearchedCoordinates(ownedData);
   const place = { ...placeData, id: createId() };
   await db.execute({
     sql: "INSERT INTO places (id, data, created_at) VALUES (?, ?, ?)",
@@ -100,10 +112,12 @@ app.patch("/places/:id", async (c) => {
   if (!currentPlace) return c.json({ error: "No existe" }, 404);
   if (isHiddenFrom(currentPlace, c.get("player"))) return c.json({ error: "Este lote está sellado" }, 403);
 
-  const { id: _ignoredId, isSealed: _ignoredSealed, secretOwner: _ignoredOwner, isSecret, ...changes } = await c.req.json();
+  const { id: _ignoredId, isSealed: _ignoredSealed, secretOwner: _ignoredOwner, searchedCoordinates: _ignoredPoint, isSecret, ...changes } = await c.req.json();
   // A secret can be revealed (isSecret: false) but nothing can become secret after it was created.
   if (isSecret === false) changes.isSecret = false;
-  const { id: _sameId, ...updatedData } = { ...currentPlace, ...changes };
+  const { id: _sameId, ...mergedData } = { ...currentPlace, ...changes };
+  const touchesLocation = "location" in changes || "coordinates" in changes;
+  const updatedData = touchesLocation ? await withSearchedCoordinates(mergedData, currentPlace) : mergedData;
   await db.execute({ sql: "UPDATE places SET data = ? WHERE id = ?", args: [JSON.stringify(updatedData), placeId] });
   return c.json({ ...updatedData, id: placeId });
 });

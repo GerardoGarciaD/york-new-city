@@ -19,6 +19,7 @@ import { Hero } from "./components/layout/Hero";
 import { NavBar } from "./components/layout/NavBar";
 import { SiteFooter } from "./components/layout/SiteFooter";
 import { PlaceListSection } from "./components/list/PlaceListSection";
+import { GourmetMapSection } from "./components/map/GourmetMapSection";
 import { LoginGate } from "./components/login/LoginGate";
 import { PlaceRing } from "./components/ring/PlaceRing";
 import { RevealAnimation } from "./components/secret/RevealAnimation";
@@ -198,6 +199,7 @@ export default function App() {
           onChangeStatusFilter={setStatusFilter}
           onOpenPlace={openPlaceDetail}
         />
+        <GourmetMapSection places={sharedPlaces} isLoaded={isLoaded} onOpenPlace={openPlaceDetail} />
         <SiteFooter />
         <FishingLine />
 

@@ -2,6 +2,11 @@ const MENTIONS_NEW_YORK = /new york|nueva york|nyc|\bny\b|manhattan|brooklyn|que
 const GOOGLE_MAPS_LINK = /^https:\/\/(maps\.app\.goo\.gl\/|goo\.gl\/maps|share\.google\/|(www\.|maps\.)?google\.[a-z.]+\/maps|maps\.google\.[a-z.]+\/)/i;
 const EXACT_PIN_ZOOM = 17;
 
+/** Where a place goes on the Gourmet Map: the exact pin from a link, else the one the server searched. */
+export function getMapPoint(place) {
+  return place.coordinates || place.searchedCoordinates || null;
+}
+
 /** True when the text is a pasted Google Maps link (long or the short one the phone shares). */
 export function looksLikeGoogleMapsLink(text) {
   return GOOGLE_MAPS_LINK.test(text.trim());

@@ -8,12 +8,14 @@
     "build": "vite build",
     "preview": "vite preview",
     "db:user": "node scripts/set-user.mjs",
-    "db:seed": "node scripts/seed-places.mjs"
+    "db:seed": "node scripts/seed-places.mjs",
+    "db:geocode": "node scripts/geocode-places.mjs"
   },
   "dependencies": {
     "@hono/node-server": "2.1.5",
     "@libsql/client": "0.18.0",
     "hono": "4.13.13",
+    "leaflet": "1.9.4",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },
