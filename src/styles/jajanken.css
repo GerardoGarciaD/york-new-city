@@ -3,6 +3,9 @@
 .jjk>div{display:grid;gap:6px;justify-items:center}
 .hand{display:grid;place-items:center;width:min(120px,30vw);aspect-ratio:1;border:3px solid var(--ink);border-radius:6px;box-shadow:5px 5px 0 var(--ink);font-family:var(--manga);font-size:clamp(20px,6vw,28px);background:var(--soft)}
 .hand.win{background:var(--sun)}
+/* Small Spanish name under the katakana, just to tell which hand it is. */
+.hand{align-content:center;gap:6px}
+.hand-name{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .hand.shake{animation:shake .5s ease-in-out 3}
 @keyframes shake{25%{transform:translateY(-10px) rotate(-6deg)}75%{transform:translateY(4px) rotate(4deg)}}
 .jjk small{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}

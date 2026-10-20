@@ -7,7 +7,8 @@ import { CrossTitle } from "../common/CrossTitle";
 import { Modal } from "../common/Modal";
 
 const SHAKE_DURATION_MS = 1500;
-const ROCK_JAPANESE = "グー";
+/** "Saisho wa gū": every round starts showing rock while the hands shake. */
+const STARTING_HAND = HANDS.find((hand) => hand.key === "rock");
 
 /** Two different random hands, so there is always a winner. */
 function throwTwoDifferentHands() {
@@ -65,14 +66,16 @@ export function JajankenDialog({ isOpen, onClose }) {
         <div className="jjk">
           <div>
             <span key={`first-${roundNumber}`} className={handClassName(firstPlayerWins)}>
-              {firstHand ? firstHand.japaneseName : ROCK_JAPANESE}
+              {(firstHand || STARTING_HAND).japaneseName}
+              <span className="hand-name">{(firstHand || STARTING_HAND).name}</span>
             </span>
             <small>{PEOPLE.firstPlayer}</small>
           </div>
           <span className="vs">VS</span>
           <div>
             <span key={`second-${roundNumber}`} className={handClassName(!firstPlayerWins)}>
-              {secondHand ? secondHand.japaneseName : ROCK_JAPANESE}
+              {(secondHand || STARTING_HAND).japaneseName}
+              <span className="hand-name">{(secondHand || STARTING_HAND).name}</span>
             </span>
             <small>{PEOPLE.secondPlayer}</small>
           </div>
